@@ -37,7 +37,7 @@ The UK Biobank DRAGEN pVCFs provide local allele depths (`FORMAT/LAD`) rather th
 | sha256 | `500b2ca7debc5696c2e97cb8084304ecad843ef4a6d3b7a9908a4f8110aa201c` |
 | Tests | The branch's `2.0/Tests/TEST_VCF_LAD_FILTER` passes with this binary |
 
-To rebuild elsewhere, check out that commit and run the build command above; drop `NO_LAPACK=1` if you need plink2's LAPACK-dependent commands.
+This binary predates the repository's current plink2 build, which adds the All of Us features to the same repository and keeps `--vcf-min-lad <n>` unchanged; build that with `plink2/build_plink2.sh` (see [`plink2/README.md`](../plink2/README.md); drop `NO_LAPACK=1` from `PLINK2_MAKE_ARGS` in `versions.env` if you need plink2's LAPACK-dependent commands).
 
 ## Building the applet
 

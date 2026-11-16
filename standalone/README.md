@@ -6,12 +6,12 @@ The scripts in this folder run the same plink2 command as the [DNAnexus applet](
 
 | Script | Purpose |
 |---|---|
-| `build_plink2.sh` | Builds the modified plink2 from the commit given in the [applet README](../dnanexus_app/README.md#the-modified-plink2-binary) (Linux or macOS; needs a C/C++ compiler, make, zlib headers and curl) |
+| `build_plink2.sh` | Builds the modified plink2 pinned in [`plink2/versions.env`](../plink2/versions.env) (shortcut for `plink2/build_plink2.sh`). Linux or macOS; needs a C/C++ compiler, make, zlib headers and git |
 | `pvcf2pgen.sh` | Applies the genotype-level QC to one VCF/BCF and converts it to pgen |
 | `run_batch.sh` | Converts a list of chunks in parallel; rerunning the same command skips completed chunks |
 | `merge_chunks.sh` | Merges the converted chunks of one chromosome |
 
-**plink2.** On Linux x86-64 you can use the bundled `dnanexus_app/resources/home/dnanexus/plink2_ukbb_vcftopgen`. Otherwise build it:
+**plink2.** These scripts need the modified plink2 described in [`plink2/README.md`](../plink2/README.md). On Linux x86-64 you can use the bundled `dnanexus_app/resources/home/dnanexus/plink2_ukbb_vcftopgen`. Otherwise build it:
 
 ```
 standalone/build_plink2.sh -o ~/bin/plink2      # set TMPDIR to build somewhere other than /tmp
@@ -46,10 +46,10 @@ f=$(sed -n "${SLURM_ARRAY_TASK_ID}p" chr21_chunks.txt)
 standalone/pvcf2pgen.sh -i "$f" -o "pgen/chr21/$(basename "$f" .vcf.gz)" -q 10 -d 8 -m 0.1 -t 2 -M 7000
 ```
 
-**Containers and other clouds.** The `Dockerfile` in this folder builds an image with the modified plink2 and the three scripts on the `PATH`, for platforms that run Docker images:
+**Containers and other clouds.** The `Dockerfile` in this folder builds an image with the modified plink2 and the three scripts on the `PATH`, for platforms that run Docker images. Build it from the repository root, since it needs `plink2/`:
 
 ```
-docker build -t ukbb-pvcf2pgen standalone/
+docker build -f standalone/Dockerfile -t ukbb-pvcf2pgen .
 docker run --rm -v "$PWD":/data -w /data ukbb-pvcf2pgen \
   pvcf2pgen.sh -i chunk.vcf.gz -o out/chunk -q 10 -d 8 -m 0.1
 ```
