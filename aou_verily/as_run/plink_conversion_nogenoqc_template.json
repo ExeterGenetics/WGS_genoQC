@@ -1,0 +1,14 @@
+{
+    "plink_conversion.sharded_vcf_path": "gs://pgen-bucket-wb-cordial-banana-2765/wgs_v9_hail_vcfs/chr<chr>_genoqc.vcf.bgz",
+    "plink_conversion.output_base_path": "gs://pgen-bucket-wb-cordial-banana-2765/wgs_v9_pgens_nogenoqc",
+    "plink_conversion.out_name": "chr<chr>_nogenoqc",
+    "plink_conversion.chr": "<chr>",
+    "plink_conversion.plink_path": "gs://pgen-bucket-wb-cordial-banana-2765/wgs_conversion_code",
+    "plink_conversion.plink_binary": "plink2_mod",
+    "plink_conversion.min_gq": 0,
+    "plink_conversion.min_lad_diploid": 0,
+    "plink_conversion.min_lad_haploid": 0,
+    "plink_conversion.do_convert": true,
+    "plink_conversion.do_merge": true,
+    "plink_conversion.batch_size_gb": 10
+}

@@ -1,0 +1,16 @@
+{
+    "plink_conversion.sharded_vcf_path": "<BUCKET>/wgs_hail_vcfs/chr<CHR>_genoqc.vcf.bgz",
+    "plink_conversion.output_base_path": "<BUCKET>/wgs_pgens_genoqc",
+    "plink_conversion.out_name": "chr<CHR>_genoqc",
+    "plink_conversion.chr": "<CHR>",
+    "plink_conversion.reference_fasta": "<BUCKET>/reference/GRCh38_full_analysis_set_plus_decoy_hla.fa",
+    "plink_conversion.sex_psam": "<BUCKET>/auxiliary_data/wgs_sex.psam",
+    "plink_conversion.split_multiallelics": true,
+    "plink_conversion.min_gq": 20,
+    "plink_conversion.min_lad_diploid": 8,
+    "plink_conversion.min_lad_haploid": 4,
+    "plink_conversion.max_missing": 0.1,
+    "plink_conversion.do_convert": true,
+    "plink_conversion.do_merge": true,
+    "plink_conversion.batch_size_gb": 10
+}

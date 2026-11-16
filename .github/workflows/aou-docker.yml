@@ -1,0 +1,101 @@
+name: Build AoU conversion Docker image
+
+# Builds aou_verily/docker/Dockerfile and pushes it to Docker Hub as
+#   <DOCKERHUB_USERNAME>/wgs_genoqc_aou:plink2-<commit7>          (moves with each build)
+#   <DOCKERHUB_USERNAME>/wgs_genoqc_aou:plink2-<commit7>-<run>    (fixed; use this to pin a run)
+#   <DOCKERHUB_USERNAME>/wgs_genoqc_aou:latest
+# where <commit7> is PLINK2_COMMIT from plink2/versions.env.
+# Needs repository secrets DOCKERHUB_USERNAME and DOCKERHUB_TOKEN.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - aou_verily/docker/**
+      - aou_verily/scripts/gcloud_batch_files_by_size.py
+      - plink2/versions.env
+      - plink2/build_plink2.sh
+      - .github/workflows/aou-docker.yml
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read pinned plink2 commit
+        id: plink
+        run: |
+          . plink2/versions.env
+          echo "short=${PLINK2_COMMIT:0:7}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          # RUN steps could not resolve archive.ubuntu.com with the runner's resolver
+          buildkitd-config-inline: |
+            [dns]
+              nameservers = ["8.8.8.8", "1.1.1.1"]
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build image (load locally)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: aou_verily/docker/Dockerfile
+          push: false
+          load: true
+          tags: wgs-genoqc-aou-tmp:build
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Resolve tool versions
+        id: versions
+        run: |
+          description=$(
+            {
+              echo "- PLINK (plink2/versions.env)"
+              docker run --rm wgs-genoqc-aou-tmp:build plink2 --version
+              echo "- bcftools"
+              docker run --rm wgs-genoqc-aou-tmp:build bcftools --version | head -n 2
+              echo "- Google Cloud CLI"
+              docker run --rm wgs-genoqc-aou-tmp:build gcloud version | head -n 1
+            } | sed ':a;N;$!ba;s/\n/<br>/g'
+          )
+          echo "description=${description}" >> "$GITHUB_OUTPUT"
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/wgs_genoqc_aou
+          tags: |
+            type=raw,value=plink2-${{ steps.plink.outputs.short }}
+            type=raw,value=plink2-${{ steps.plink.outputs.short }}-${{ github.run_number }}
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.description=${{ steps.versions.outputs.description }}
+            org.opencontainers.image.version=plink2-${{ steps.plink.outputs.short }}-${{ github.run_number }}
+            org.opencontainers.image.title=wgs_genoqc_aou
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: aou_verily/docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
