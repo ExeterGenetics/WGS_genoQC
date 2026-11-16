@@ -1,0 +1,121 @@
+{
+  "name": "plink_conv",
+  "title": "plink_conv",
+  "summary": "plink_conv",
+  "dxapi": "1.0.0",
+  "version": "1.0.0",
+  "inputSpec": [
+    {
+      "name": "vcf_list",
+      "label": "vcf_list",
+      "class": "file",
+      "optional": false,
+      "patterns": [
+        "*"
+      ],
+      "help": "vcf_list"
+    },
+    {
+      "name": "processes",
+      "label": "processes",
+      "class": "string",
+      "optional": false,
+      "patterns": [
+        "*"
+      ],
+      "help": "processes"
+    },
+    {
+      "name": "mem",
+      "label": "mem",
+      "class": "string",
+      "optional": false,
+      "patterns": [
+        "*"
+      ],
+      "help": "memory per plink process"
+    },
+    {
+      "name": "sex_file",
+      "label": "sex_file",
+      "class": "file",
+      "optional": true,
+      "patterns": [
+        "*"
+      ],
+      "help": "file with header #IID SEX"
+    },
+    {
+      "name": "PAR",
+      "label": "PAR",
+      "class": "boolean",
+      "optional": false,
+      "default": false,
+      "help": "In pseudoautosomal region"
+    },
+    {
+      "name": "outdir",
+      "label": "outdir",
+      "class": "string",
+      "optional": false,
+      "help": "Project folder for output; per-chunk pgen/pvar/psam are written to <outdir>/<chrom>/"
+    },
+    {
+      "name": "mingq",
+      "label": "mingq",
+      "class": "string",
+      "optional": false,
+      "help": "Minimum GQ: genotypes with GQ below this value are set to missing (plink2 --vcf-min-gq)"
+    },
+    {
+      "name": "mindp",
+      "label": "mindp",
+      "class": "string",
+      "optional": false,
+      "help": "Minimum depth = sum of FORMAT/LAD (missing LAD counts as 0): genotypes below this value are set to missing; haploid calls use ceil(value/2) (plink2 --vcf-min-lad)"
+    },
+    {
+      "name": "maxmiss",
+      "label": "maxmiss",
+      "class": "string",
+      "optional": false,
+      "help": "Maximum genotype missingness per variant after genotype filtering; variants above this are removed (plink2 --geno)"
+    }
+  ],
+  "outputSpec": [
+    {
+      "name": "output",
+      "label": "Output String",
+      "class": "string",
+      "help": "Output string"
+    }
+  ],
+  "runSpec": {
+    "timeoutPolicy": {
+      "*": {
+        "days": 5
+      }
+    },
+    "interpreter": "bash",
+    "release": "24.04",
+    "distribution": "Ubuntu",
+    "file": "src/convert.sh",
+    "version": "0"
+  },
+  "access": {
+    "project": "CONTRIBUTE",   
+    "allProjects": "VIEW",
+  "network": [
+      "*"
+    ]
+  },
+  "regionalOptions": {
+    "aws:eu-west-2": {
+      "systemRequirements": {
+        "*": {
+          "instanceType": "mem3_ssd1_v2_x8"
+        }
+      }
+    }
+  }
+}
